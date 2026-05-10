@@ -11,11 +11,8 @@ import com.example.automatas.service.SubsetConstructionService;
 import com.example.automatas.service.ValidationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
- 
 import org.springframework.stereotype.Controller;
-
 import org.springframework.ui.Model;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,20 +38,8 @@ public class AutomataController {
     @GetMapping("/")
     public String inicio(Model model) {
 
-        model.addAttribute(
-                "automata",
-                "iot"
-        );
-
-        model.addAttribute(
-                "alfabeto",
-                "Σ = {H, T, U, C}"
-        );
-
-        model.addAttribute(
-                "ejemplos",
-                "HTC, HUC, HTTC, HUUC, HTUC"
-        );
+        model.addAttribute("automata", "iot");
+        agregarDatosVisuales("iot", model);
 
         return "index";
     }
@@ -64,153 +49,61 @@ public class AutomataController {
                           @RequestParam String cadena,
                           Model model) {
 
-        /*
-         * Obtener AFND
-         */
-        AFND afnd =
-                afndService.obtenerAutomata(
-                        automata
-                );
+        AFND afnd = afndService.obtenerAutomata(automata);
 
-        /*
-         * Validación AFND
-         */
         ValidationResult resultadoAFND =
-                afndValidationService
-                        .validar(
-                                afnd,
-                                cadena
-                        );
+                afndValidationService.validar(afnd, cadena);
 
-        /*
-         * Conversión AFND -> AFD
-         */
-        AFD afd =
-                subsetService.convertir(
-                        afnd
-                );
+        AFD afd = subsetService.convertir(afnd);
 
-        /*
-         * Validación AFD
-         */
         ValidationResult resultadoAFD =
-                validationService
-                        .validar(
-                                afd,
-                                cadena
-                        );
+                validationService.validar(afd, cadena);
 
-        /*
-         * Minimización
-         */
-        AFD afdMinimizado =
-                minimizationService
-                        .minimizar(
-                                afd
-                        );
+        AFD afdMinimizado = minimizationService.minimizar(afd);
 
-        /*
-         * Validación AFD mínimo
-         */
         ValidationResult resultadoMinimizado =
-                validationService
-                        .validar(
-                                afdMinimizado,
-                                cadena
-                        );
+                validationService.validar(afdMinimizado, cadena);
 
-        /*
-         * Equivalencia
-         */
         boolean equivalentes =
-                resultadoAFND.isAceptada()
-                ==
-                resultadoAFD.isAceptada()
-                &&
-                resultadoAFD.isAceptada()
-                ==
-                resultadoMinimizado.isAceptada();
+                resultadoAFND.isAceptada() == resultadoAFD.isAceptada()
+                && resultadoAFD.isAceptada() == resultadoMinimizado.isAceptada();
 
-        /*
-         * Datos visuales
-         */
+        model.addAttribute("automata",            automata);
+        model.addAttribute("cadena",              cadena);
+        model.addAttribute("resultadoAFND",       resultadoAFND);
+        model.addAttribute("resultadoAFD",        resultadoAFD);
+        model.addAttribute("resultadoMinimizado", resultadoMinimizado);
+        model.addAttribute("equivalentes",        equivalentes);
+
+        agregarDatosVisuales(automata, model);
+
+        return "index";
+    }
+
+    private void agregarDatosVisuales(String automata, Model model) {
+
         String alfabeto;
         String ejemplos;
 
         switch (automata) {
 
             case "iot":
-
-                alfabeto =
-                        "Σ = {H, T, U, C}";
-
-                ejemplos =
-                        "HTC, HUC, HTTC, HUUC, HTUC";
-
+                alfabeto = "Σ = {H, T, U, C}  —  H: Header, T: Temperature sensor, U: Humidity sensor, C: Close";
+                ejemplos = "HTC,  HUC,  HTTC,  HUUC,  HTUC,  HUTC,  HTTTC,  HUUUC,  HTUUC,  HTTUC,  HTUUTC,  HTUTUTC";
                 break;
 
             case "genetico":
-
-                alfabeto =
-                        "Σ = {K, G, X, F}";
-
-                ejemplos =
-                        "KGF, KGXF, KGXXF, KGXXXF";
-
+                alfabeto = "Σ = {K, G, X, F}  —  K: Start codon, G: Gene marker, X: Repeat unit, F: Finish codon";
+                ejemplos = "KGF,  KGXF,  KGXXF,  KGXXXF,  KGXXXXF,  KGXXXXXF,  KGXXXXXXF,  KGXXXXXXXF,  KGXXXXXXXXF,  KGXXXXXXXXXF,  KGXXXXXXXXXXF,  KGXXXXXXXXXXXF";
                 break;
 
             default:
-
-                alfabeto =
-                        "Σ = {H, S, C}";
-
-                ejemplos =
-                        "HC, HSC, HSSC, HSSSC";
+                alfabeto = "Σ = {H, S, C}  —  H: Header/inicio de orden, S: Step/paso de proceso, C: Confirmation/confirmación";
+                ejemplos = "HC,  HSC,  HSSC,  HSSSC,  HSSSSC,  HSSSSSC,  HSSSSSSC,  HSSSSSSSC,  HSSSSC,  HSSSSSC,  HSSSSSSSC,  HSSSSSSSSC";
+                break;
         }
 
-        /*
-         * Enviar datos
-         */
-        model.addAttribute(
-                "automata",
-                automata
-        );
-
-        model.addAttribute(
-                "cadena",
-                cadena
-        );
-
-        model.addAttribute(
-                "alfabeto",
-                alfabeto
-        );
-
-        model.addAttribute(
-                "ejemplos",
-                ejemplos
-        );
-
-        model.addAttribute(
-                "resultadoAFND",
-                resultadoAFND
-        );
-
-        model.addAttribute(
-                "resultadoAFD",
-                resultadoAFD
-        );
-
-        model.addAttribute(
-                "resultadoMinimizado",
-                resultadoMinimizado
-        );
-
-        model.addAttribute(
-                "equivalentes",
-                equivalentes
-        );
-
-        return "index";
+        model.addAttribute("alfabeto", alfabeto);
+        model.addAttribute("ejemplos", ejemplos);
     }
 }

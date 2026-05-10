@@ -2,583 +2,369 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>
-        Sistema de Autómatas
-    </title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Autómatas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-
         body {
-
             background: #0f172a;
-
-            color: white;
-
+            color: #f1f5f9;
             min-height: 100vh;
-
             font-family: Arial, sans-serif;
         }
 
         .main-card {
-
             background: #1e293b;
-
             border-radius: 20px;
-
             padding: 35px;
-
             box-shadow: 0 0 25px rgba(0,0,0,0.5);
         }
 
         .title {
-
             text-align: center;
-
-            font-size: 2.3rem;
-
+            font-size: 2.1rem;
             font-weight: bold;
-
             color: #38bdf8;
-
             margin-bottom: 30px;
         }
 
         .section-title {
-
             margin-top: 40px;
-
             margin-bottom: 20px;
-
             color: #38bdf8;
-
             font-weight: bold;
         }
 
-        label,
-        p,
-        li,
-        td,
-        th,
-        h5,
-        span {
-
-            color: white !important;
+        label, p, li, h5 {
+            color: #f1f5f9;
         }
 
         .form-control,
         .form-select {
-
             background: #334155;
-
-            color: white;
-
-            border: none;
+            color: #f1f5f9;
+            border: 1px solid #475569;
         }
 
         .form-control:focus,
         .form-select:focus {
-
             background: #475569;
+            color: #f1f5f9;
+            box-shadow: 0 0 0 0.2rem rgba(56,189,248,0.35);
+            border-color: #38bdf8;
+        }
 
-            color: white;
-
-            box-shadow: none;
+        .form-control::placeholder {
+            color: #94a3b8;
         }
 
         .btn-custom {
-
             background: #38bdf8;
-
             border: none;
-
-            color: black;
-
+            color: #0f172a;
             font-weight: bold;
         }
 
         .btn-custom:hover {
-
             background: #0ea5e9;
+            color: #0f172a;
         }
 
         .flow-box {
-
             background: #334155;
-
             padding: 20px;
-
             border-radius: 12px;
-
             text-align: center;
-
             font-weight: bold;
-        }
-
-        .table {
-
-            color: white;
-        }
-
-        .table-dark {
-
-            background: #020617;
+            color: #f1f5f9;
         }
 
         .card-dark {
-
             background: #334155;
-
             border-radius: 15px;
-
             padding: 20px;
+            color: #f1f5f9;
+        }
+
+        .card-dark h5 {
+            color: #38bdf8;
+        }
+
+        /* Alertas Bootstrap: fondo claro → texto oscuro */
+        .alert-success {
+            background-color: #dcfce7;
+            color: #14532d;
+            border-color: #86efac;
+            font-weight: bold;
+        }
+
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #7f1d1d;
+            border-color: #fca5a5;
+            font-weight: bold;
         }
 
         .accepted {
-
-            color: #22c55e !important;
-
+            color: #4ade80 !important;
             font-weight: bold;
         }
 
         .rejected {
-
-            color: #ef4444 !important;
-
+            color: #f87171 !important;
             font-weight: bold;
         }
 
         .examples {
-
             color: #cbd5e1 !important;
+            font-size: 0.95rem;
         }
 
-    </style>
+        /* Tabla con fondo oscuro propio — sin depender de Bootstrap */
+        .tabla-automatas {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
 
+        .tabla-automatas thead tr {
+            background: #020617;
+        }
+
+        .tabla-automatas thead th {
+            color: #f1f5f9;
+            padding: 12px 16px;
+            border: 1px solid #475569;
+            font-weight: bold;
+        }
+
+        .tabla-automatas tbody tr {
+            background: #1e3a5f;
+        }
+
+        .tabla-automatas tbody tr:nth-child(even) {
+            background: #1e293b;
+        }
+
+        .tabla-automatas tbody td {
+            color: #f1f5f9;
+            padding: 12px 16px;
+            border: 1px solid #475569;
+        }
+
+        .list-group-item.bg-dark {
+            background-color: #1e293b !important;
+            color: #f1f5f9 !important;
+            border-color: #334155;
+        }
+
+        .card-dark ul li {
+            color: #cbd5e1;
+            margin-bottom: 6px;
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="container mt-5 mb-5">
-
     <div class="main-card">
 
-        <!-- TITULO -->
+        <div class="title">Sistema de Conversión y Minimización de Autómatas</div>
 
-        <div class="title">
+        <form method="post" action="/validar">
 
-            Sistema de Conversión y Minimización de Autómatas
-
-        </div>
-
-        <!-- FORMULARIO -->
-
-        <form method="post"
-              action="/validar">
-
+            <!-- 1. SELECTOR -->
             <div class="mb-3">
-
-                <label class="form-label">
-
-                    Seleccione el autómata
-
-                </label>
-
-                <select class="form-select"
-                        name="automata">
-
-                    <option value="iot"
-                            th:selected="${automata == 'iot'}">
-
-                        Telemetría IoT
-
-                    </option>
-
-                    <option value="genetico"
-                            th:selected="${automata == 'genetico'}">
-
-                        Secuencias Genéticas
-
-                    </option>
-
-                    <option value="ecommerce"
-                            th:selected="${automata == 'ecommerce'}">
-
-                        E-commerce
-
-                    </option>
-
+                <label class="form-label fw-bold">Seleccione el autómata</label>
+                <select class="form-select" name="automata" id="selectAutomata"
+                        onchange="actualizarInfo(this.value)">
+                    <option value="iot"       th:selected="${automata == 'iot'}">Telemetría IoT</option>
+                    <option value="genetico"  th:selected="${automata == 'genetico'}">Secuencias Genéticas</option>
+                    <option value="ecommerce" th:selected="${automata == 'ecommerce'}">E-commerce</option>
                 </select>
-
             </div>
 
-            <!-- ALFABETO -->
-
-            <div class="card-dark mb-3">
-
-                <h5>
-
-                    Alfabeto Reconocido
-
-                </h5>
-
-                <p th:text="${alfabeto}">
-
-                </p>
-
-            </div>
-
-            <!-- EJEMPLOS -->
-
-            <div class="card-dark mb-3">
-
-                <h5>
-
-                    Ejemplos de Cadenas Aceptadas
-
-                </h5>
-
-                <p class="examples"
-                   th:text="${ejemplos}">
-
-                </p>
-
-            </div>
-
-            <!-- INPUT -->
-
+            <!-- 2. INPUT (justo debajo del selector) -->
             <div class="mb-3">
-
-                <label class="form-label">
-
-                    Ingrese una cadena
-
-                </label>
-
+                <label class="form-label fw-bold">Ingrese una cadena para validar</label>
                 <input type="text"
                        class="form-control"
                        name="cadena"
-                       required
+                       id="inputCadena"
+                       placeholder="Ej: HTC"
+                       autocomplete="off"
                        th:value="${cadena}">
-
+                <div class="form-text" style="color:#94a3b8;" id="hintCadena"></div>
             </div>
 
-            <button type="submit"
-                    class="btn btn-custom w-100">
-
-                Validar Cadena
-
+            <button type="submit" class="btn btn-custom w-100 py-2">
+                ▶ Validar Cadena
             </button>
+
+            <!-- 3. ALFABETO -->
+            <div class="card-dark mb-3 mt-4">
+                <h5>Alfabeto Reconocido</h5>
+                <p id="textoAlfabeto" th:text="${alfabeto}"></p>
+            </div>
+
+            <!-- 4. LENGUAJE VÁLIDO -->
+            <div class="card-dark mb-3">
+                <h5>Lenguaje Válido</h5>
+                <p id="textoLenguaje" class="examples"></p>
+            </div>
+
+            <!-- 5. CADENAS ACEPTADAS -->
+            <div class="card-dark mb-3">
+                <h5>Ejemplos de Cadenas Aceptadas</h5>
+                <p id="textoEjemplos" class="examples" th:text="${ejemplos}"></p>
+            </div>
+
+            <!-- 6. CADENAS RECHAZADAS -->
+            <div class="card-dark mb-3">
+                <h5>Ejemplos de Cadenas Rechazadas</h5>
+                <p id="textoRechazadas" class="examples"></p>
+            </div>
 
         </form>
 
         <!-- FLUJO -->
-
-        <div class="section-title">
-
-            Flujo Formal del Sistema
-
-        </div>
-
+        <div class="section-title">Flujo Formal del Sistema</div>
         <div class="row text-center">
-
-            <div class="col-md-3 mb-3">
-
-                <div class="flow-box">
-
-                    AFND
-
-                </div>
-
-            </div>
-
-            <div class="col-md-3 mb-3">
-
-                <div class="flow-box">
-
-                    Construcción de Subconjuntos
-
-                </div>
-
-            </div>
-
-            <div class="col-md-3 mb-3">
-
-                <div class="flow-box">
-
-                    AFD Equivalente
-
-                </div>
-
-            </div>
-
-            <div class="col-md-3 mb-3">
-
-                <div class="flow-box">
-
-                    Minimización
-
-                </div>
-
-            </div>
-
+            <div class="col-md-3 mb-3"><div class="flow-box">AFND Original</div></div>
+            <div class="col-md-3 mb-3"><div class="flow-box">Construcción de Subconjuntos</div></div>
+            <div class="col-md-3 mb-3"><div class="flow-box">AFD Equivalente</div></div>
+            <div class="col-md-3 mb-3"><div class="flow-box">AFD Minimizado</div></div>
         </div>
 
         <!-- RESULTADOS -->
-
         <div th:if="${resultadoAFND != null}">
 
-            <div class="section-title">
+            <div class="section-title">Equivalencia entre Autómatas</div>
 
-                Equivalencia entre Autómatas
-
-            </div>
-
-            <table class="table table-bordered">
-
-                <thead class="table-dark">
-
-                <tr>
-
-                    <th>
-                        Autómata
-                    </th>
-
-                    <th>
-                        Resultado
-                    </th>
-
-                </tr>
-
+            <!-- Tabla propia sin Bootstrap para evitar el fondo blanco -->
+            <table class="tabla-automatas">
+                <thead>
+                    <tr>
+                        <th>Autómata</th>
+                        <th>Resultado</th>
+                    </tr>
                 </thead>
-
                 <tbody>
-
-                <tr>
-
-                    <td>
-                        AFND
-                    </td>
-
-                    <td>
-
-                        <span th:if="${resultadoAFND.aceptada}"
-                              class="accepted">
-
-                            Aceptada
-
-                        </span>
-
-                        <span th:unless="${resultadoAFND.aceptada}"
-                              class="rejected">
-
-                            Rechazada
-
-                        </span>
-
-                    </td>
-
-                </tr>
-
-                <tr>
-
-                    <td>
-                        AFD
-                    </td>
-
-                    <td>
-
-                        <span th:if="${resultadoAFD.aceptada}"
-                              class="accepted">
-
-                            Aceptada
-
-                        </span>
-
-                        <span th:unless="${resultadoAFD.aceptada}"
-                              class="rejected">
-
-                            Rechazada
-
-                        </span>
-
-                    </td>
-
-                </tr>
-
-                <tr>
-
-                    <td>
-                        AFD Minimizado
-                    </td>
-
-                    <td>
-
-                        <span th:if="${resultadoMinimizado.aceptada}"
-                              class="accepted">
-
-                            Aceptada
-
-                        </span>
-
-                        <span th:unless="${resultadoMinimizado.aceptada}"
-                              class="rejected">
-
-                            Rechazada
-
-                        </span>
-
-                    </td>
-
-                </tr>
-
+                    <tr>
+                        <td>AFND Original</td>
+                        <td>
+                            <span th:if="${resultadoAFND.aceptada}" class="accepted">✔ Aceptada</span>
+                            <span th:unless="${resultadoAFND.aceptada}" class="rejected">✘ Rechazada</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>AFD (Subconjuntos)</td>
+                        <td>
+                            <span th:if="${resultadoAFD.aceptada}" class="accepted">✔ Aceptada</span>
+                            <span th:unless="${resultadoAFD.aceptada}" class="rejected">✘ Rechazada</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>AFD Minimizado</td>
+                        <td>
+                            <span th:if="${resultadoMinimizado.aceptada}" class="accepted">✔ Aceptada</span>
+                            <span th:unless="${resultadoMinimizado.aceptada}" class="rejected">✘ Rechazada</span>
+                        </td>
+                    </tr>
                 </tbody>
-
             </table>
 
-            <!-- EQUIVALENCIA -->
-
-            <div th:if="${equivalentes}"
-                 class="alert alert-success">
-
-                Los tres autómatas reconocen
-                exactamente el mismo lenguaje.
-
+            <div th:if="${equivalentes}" class="alert alert-success">
+                ✔ Los tres autómatas reconocen exactamente el mismo lenguaje — equivalencia verificada.
+            </div>
+            <div th:unless="${equivalentes}" class="alert alert-danger">
+                ✘ Los autómatas NO son equivalentes. Revisar la implementación.
             </div>
 
-            <div th:unless="${equivalentes}"
-                 class="alert alert-danger">
-
-                Los autómatas NO son equivalentes.
-
-            </div>
-
-            <!-- RECORRIDO AFND -->
-
-            <div class="section-title">
-
-                Flujo de Ejecución AFND
-
-            </div>
-
+            <div class="section-title">Flujo de Ejecución — AFND</div>
             <ul class="list-group mb-4">
-
-                <li class="list-group-item bg-dark text-white"
-
-                    th:each="paso :
-                    ${resultadoAFND.recorrido}"
-
-                    th:text="${paso}">
-
-                </li>
-
+                <li class="list-group-item bg-dark"
+                    th:each="paso : ${resultadoAFND.recorrido}"
+                    th:text="${paso}"></li>
             </ul>
 
-            <!-- RECORRIDO AFD -->
-
-            <div class="section-title">
-
-                Flujo de Ejecución AFD
-
-            </div>
-
+            <div class="section-title">Flujo de Ejecución — AFD (Subconjuntos)</div>
             <ul class="list-group mb-4">
-
-                <li class="list-group-item bg-dark text-white"
-
-                    th:each="paso :
-                    ${resultadoAFD.recorrido}"
-
-                    th:text="${paso}">
-
-                </li>
-
+                <li class="list-group-item bg-dark"
+                    th:each="paso : ${resultadoAFD.recorrido}"
+                    th:text="${paso}"></li>
             </ul>
 
-            <!-- RECORRIDO AFD MINIMIZADO -->
-
-            <div class="section-title">
-
-                Flujo de Ejecución AFD Minimizado
-
-            </div>
-
+            <div class="section-title">Flujo de Ejecución — AFD Minimizado</div>
             <ul class="list-group mb-4">
-
-                <li class="list-group-item bg-dark text-white"
-
-                    th:each="paso :
-                    ${resultadoMinimizado.recorrido}"
-
-                    th:text="${paso}">
-
-                </li>
-
+                <li class="list-group-item bg-dark"
+                    th:each="paso : ${resultadoMinimizado.recorrido}"
+                    th:text="${paso}"></li>
             </ul>
 
         </div>
 
-        <!-- INFORMACION -->
-
-        <div class="section-title">
-
-            Información del Proyecto
-
-        </div>
-
+        <!-- INFO PROYECTO -->
+        <div class="section-title">Información del Proyecto</div>
         <div class="card-dark">
-
             <ul>
-
-                <li>
-
-                    Representación formal de AFND
-                    mediante quíntuplas.
-
-                </li>
-
-                <li>
-
-                    Conversión automática AFND → AFD
-                    usando construcción de subconjuntos.
-
-                </li>
-
-                <li>
-
-                    Minimización automática de AFD.
-
-                </li>
-
-                <li>
-
-                    Verificación experimental de equivalencia.
-
-                </li>
-
-                <li>
-
-                    Simulación transparente del flujo
-                    de ejecución de cadenas.
-
-                </li>
-
+                <li>Representación formal de AFND mediante quíntuplas (Q, Σ, δ, q₀, F).</li>
+                <li>Conversión automática AFND → AFD usando construcción de subconjuntos.</li>
+                <li>Minimización de AFD mediante tabla de equivalencia de pares de estados.</li>
+                <li>Verificación experimental de equivalencia entre los tres autómatas.</li>
+                <li>Simulación transparente del flujo de ejecución de cadenas.</li>
             </ul>
-
         </div>
 
     </div>
-
 </div>
 
-</body>
+<script>
+    const datos = {
+        iot: {
+            alfabeto   : "Σ = {H, T, U, C}  —  H: Header, T: Temperature sensor, U: Humidity sensor, C: Close",
+            lenguaje   : "L = { H(T|U)⁺C }  —  Inicia con H, uno o más sensores T o U, termina con C.",
+            aceptadas  : "HTC,  HUC,  HTTC,  HUUC,  HTUC,  HUTC,  HTTTC,  HUUUC,  HTUUC,  HTTUC,  HTUUTC,  HTUTUTC",
+            rechazadas : "TC  (falta H),  HC  (falta sensor),  HT  (falta C),  HHC  (H doble),  H  (incompleta),  \"\"  (vacía)",
+            placeholder: "Ej: HTC  |  HUC  |  HTTC",
+            hint       : "Formato válido: H + uno o más {T, U} + C"
+        },
+        genetico: {
+            alfabeto   : "Σ = {K, G, X, F}  —  K: Start codon, G: Gene marker, X: Repeat unit, F: Finish codon",
+            lenguaje   : "L = { KGX*F }  —  Inicia con KG, cero o más X, termina con F.",
+            aceptadas  : "KGF,  KGXF,  KGXXF,  KGXXXF,  KGXXXXF,  KGXXXXXF,  KGXXXXXXF,  KGXXXXXXXF,  KGXXXXXXXXF,  KGXXXXXXXXXF,  KGXXXXXXXXXXF,  KGXXXXXXXXXXXF",
+            rechazadas : "GF  (falta K),  KF  (falta G),  KGG  (G doble),  KXF  (falta G),  KG  (falta F),  \"\"  (vacía)",
+            placeholder: "Ej: KGF  |  KGXF  |  KGXXXF",
+            hint       : "Formato válido: KG + cero o más X + F"
+        },
+        ecommerce: {
+            alfabeto   : "Σ = {H, S, C}  —  H: Header/inicio, S: Step/paso de proceso, C: Confirmation/confirmación",
+            lenguaje   : "L = { HS*C }  —  Inicia con H, cero o más pasos S, termina con C.",
+            aceptadas  : "HC,  HSC,  HSSC,  HSSSC,  HSSSSC,  HSSSSSC,  HSSSSSSC,  HSSSSSSSC,  HSSSSC,  HSSSSSC,  HSSSSSSSC,  HSSSSSSSSC",
+            rechazadas : "SC  (falta H),  SHC  (orden incorrecto),  HH  (H doble),  HS  (falta C),  H  (incompleta),  \"\"  (vacía)",
+            placeholder: "Ej: HC  |  HSC  |  HSSSC",
+            hint       : "Formato válido: H + cero o más S + C"
+        }
+    };
 
+    function actualizarInfo(valor) {
+        const d = datos[valor];
+        if (!d) return;
+        document.getElementById("textoAlfabeto").textContent   = d.alfabeto;
+        document.getElementById("textoLenguaje").textContent   = d.lenguaje;
+        document.getElementById("textoEjemplos").textContent   = d.aceptadas;
+        document.getElementById("textoRechazadas").textContent = d.rechazadas;
+        document.getElementById("inputCadena").placeholder     = d.placeholder;
+        document.getElementById("hintCadena").textContent      = d.hint;
+    }
+
+    window.addEventListener("DOMContentLoaded", function () {
+        actualizarInfo(document.getElementById("selectAutomata").value);
+    });
+</script>
+
+</body>
 </html>
