@@ -1,65 +1,577 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
 
     <meta charset="UTF-8">
-    <title>Práctica 5 - Autómatas</title>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Sistema de Autómatas
+    </title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
+    <style>
+
+        body {
+
+            background: #0f172a;
+
+            color: white;
+
+            min-height: 100vh;
+
+            font-family: Arial, sans-serif;
+        }
+
+        .main-card {
+
+            background: #1e293b;
+
+            border-radius: 20px;
+
+            padding: 35px;
+
+            box-shadow: 0 0 25px rgba(0,0,0,0.5);
+        }
+
+        .title {
+
+            text-align: center;
+
+            font-size: 2.3rem;
+
+            font-weight: bold;
+
+            color: #38bdf8;
+
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+
+            margin-top: 40px;
+
+            margin-bottom: 20px;
+
+            color: #38bdf8;
+
+            font-weight: bold;
+        }
+
+        label,
+        p,
+        li,
+        td,
+        th,
+        h5,
+        span {
+
+            color: white !important;
+        }
+
+        .form-control,
+        .form-select {
+
+            background: #334155;
+
+            color: white;
+
+            border: none;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+
+            background: #475569;
+
+            color: white;
+
+            box-shadow: none;
+        }
+
+        .btn-custom {
+
+            background: #38bdf8;
+
+            border: none;
+
+            color: black;
+
+            font-weight: bold;
+        }
+
+        .btn-custom:hover {
+
+            background: #0ea5e9;
+        }
+
+        .flow-box {
+
+            background: #334155;
+
+            padding: 20px;
+
+            border-radius: 12px;
+
+            text-align: center;
+
+            font-weight: bold;
+        }
+
+        .table {
+
+            color: white;
+        }
+
+        .table-dark {
+
+            background: #020617;
+        }
+
+        .card-dark {
+
+            background: #334155;
+
+            border-radius: 15px;
+
+            padding: 20px;
+        }
+
+        .accepted {
+
+            color: #22c55e !important;
+
+            font-weight: bold;
+        }
+
+        .rejected {
+
+            color: #ef4444 !important;
+
+            font-weight: bold;
+        }
+
+        .examples {
+
+            color: #cbd5e1 !important;
+        }
+
+    </style>
+
 </head>
+
 <body>
 
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
 
-    <div class="card shadow p-4">
+    <div class="main-card">
 
-        <h2 class="mb-4 text-center">
-            Validación de Cadenas
-        </h2>
+        <!-- TITULO -->
 
-        <form method="post" action="/validar">
+        <div class="title">
+
+            Sistema de Conversión y Minimización de Autómatas
+
+        </div>
+
+        <!-- FORMULARIO -->
+
+        <form method="post"
+              action="/validar">
 
             <div class="mb-3">
-                <label class="form-label">Seleccione el autómata</label>
 
-                <select class="form-select" name="automata">
-                    <option value="iot">Telemetría IoT</option>
-                    <option value="genetico">Secuencias Genéticas</option>
-                    <option value="ecommerce">E-commerce</option>
+                <label class="form-label">
+
+                    Seleccione el autómata
+
+                </label>
+
+                <select class="form-select"
+                        name="automata">
+
+                    <option value="iot"
+                            th:selected="${automata == 'iot'}">
+
+                        Telemetría IoT
+
+                    </option>
+
+                    <option value="genetico"
+                            th:selected="${automata == 'genetico'}">
+
+                        Secuencias Genéticas
+
+                    </option>
+
+                    <option value="ecommerce"
+                            th:selected="${automata == 'ecommerce'}">
+
+                        E-commerce
+
+                    </option>
+
                 </select>
+
             </div>
 
+            <!-- ALFABETO -->
+
+            <div class="card-dark mb-3">
+
+                <h5>
+
+                    Alfabeto Reconocido
+
+                </h5>
+
+                <p th:text="${alfabeto}">
+
+                </p>
+
+            </div>
+
+            <!-- EJEMPLOS -->
+
+            <div class="card-dark mb-3">
+
+                <h5>
+
+                    Ejemplos de Cadenas Aceptadas
+
+                </h5>
+
+                <p class="examples"
+                   th:text="${ejemplos}">
+
+                </p>
+
+            </div>
+
+            <!-- INPUT -->
+
             <div class="mb-3">
-                <label class="form-label">Ingrese la cadena</label>
+
+                <label class="form-label">
+
+                    Ingrese una cadena
+
+                </label>
 
                 <input type="text"
                        class="form-control"
                        name="cadena"
-                       required>
+                       required
+                       th:value="${cadena}">
+
             </div>
 
             <button type="submit"
-                    class="btn btn-primary w-100">
-                Validar
+                    class="btn btn-custom w-100">
+
+                Validar Cadena
+
             </button>
 
         </form>
 
-        <div class="mt-4" th:if="${resultado != null}">
+        <!-- FLUJO -->
 
-            <div th:if="${resultado}"
+        <div class="section-title">
+
+            Flujo Formal del Sistema
+
+        </div>
+
+        <div class="row text-center">
+
+            <div class="col-md-3 mb-3">
+
+                <div class="flow-box">
+
+                    AFND
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 mb-3">
+
+                <div class="flow-box">
+
+                    Construcción de Subconjuntos
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 mb-3">
+
+                <div class="flow-box">
+
+                    AFD Equivalente
+
+                </div>
+
+            </div>
+
+            <div class="col-md-3 mb-3">
+
+                <div class="flow-box">
+
+                    Minimización
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RESULTADOS -->
+
+        <div th:if="${resultadoAFND != null}">
+
+            <div class="section-title">
+
+                Equivalencia entre Autómatas
+
+            </div>
+
+            <table class="table table-bordered">
+
+                <thead class="table-dark">
+
+                <tr>
+
+                    <th>
+                        Autómata
+                    </th>
+
+                    <th>
+                        Resultado
+                    </th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+                <tr>
+
+                    <td>
+                        AFND
+                    </td>
+
+                    <td>
+
+                        <span th:if="${resultadoAFND.aceptada}"
+                              class="accepted">
+
+                            Aceptada
+
+                        </span>
+
+                        <span th:unless="${resultadoAFND.aceptada}"
+                              class="rejected">
+
+                            Rechazada
+
+                        </span>
+
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>
+                        AFD
+                    </td>
+
+                    <td>
+
+                        <span th:if="${resultadoAFD.aceptada}"
+                              class="accepted">
+
+                            Aceptada
+
+                        </span>
+
+                        <span th:unless="${resultadoAFD.aceptada}"
+                              class="rejected">
+
+                            Rechazada
+
+                        </span>
+
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>
+                        AFD Minimizado
+                    </td>
+
+                    <td>
+
+                        <span th:if="${resultadoMinimizado.aceptada}"
+                              class="accepted">
+
+                            Aceptada
+
+                        </span>
+
+                        <span th:unless="${resultadoMinimizado.aceptada}"
+                              class="rejected">
+
+                            Rechazada
+
+                        </span>
+
+                    </td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+            <!-- EQUIVALENCIA -->
+
+            <div th:if="${equivalentes}"
                  class="alert alert-success">
 
-                Cadena válida
+                Los tres autómatas reconocen
+                exactamente el mismo lenguaje.
+
             </div>
 
-            <div th:unless="${resultado}"
+            <div th:unless="${equivalentes}"
                  class="alert alert-danger">
 
-                Cadena inválida
+                Los autómatas NO son equivalentes.
+
             </div>
+
+            <!-- RECORRIDO AFND -->
+
+            <div class="section-title">
+
+                Flujo de Ejecución AFND
+
+            </div>
+
+            <ul class="list-group mb-4">
+
+                <li class="list-group-item bg-dark text-white"
+
+                    th:each="paso :
+                    ${resultadoAFND.recorrido}"
+
+                    th:text="${paso}">
+
+                </li>
+
+            </ul>
+
+            <!-- RECORRIDO AFD -->
+
+            <div class="section-title">
+
+                Flujo de Ejecución AFD
+
+            </div>
+
+            <ul class="list-group mb-4">
+
+                <li class="list-group-item bg-dark text-white"
+
+                    th:each="paso :
+                    ${resultadoAFD.recorrido}"
+
+                    th:text="${paso}">
+
+                </li>
+
+            </ul>
+
+            <!-- RECORRIDO AFD MINIMIZADO -->
+
+            <div class="section-title">
+
+                Flujo de Ejecución AFD Minimizado
+
+            </div>
+
+            <ul class="list-group mb-4">
+
+                <li class="list-group-item bg-dark text-white"
+
+                    th:each="paso :
+                    ${resultadoMinimizado.recorrido}"
+
+                    th:text="${paso}">
+
+                </li>
+
+            </ul>
+
+        </div>
+
+        <!-- INFORMACION -->
+
+        <div class="section-title">
+
+            Información del Proyecto
+
+        </div>
+
+        <div class="card-dark">
+
+            <ul>
+
+                <li>
+
+                    Representación formal de AFND
+                    mediante quíntuplas.
+
+                </li>
+
+                <li>
+
+                    Conversión automática AFND → AFD
+                    usando construcción de subconjuntos.
+
+                </li>
+
+                <li>
+
+                    Minimización automática de AFD.
+
+                </li>
+
+                <li>
+
+                    Verificación experimental de equivalencia.
+
+                </li>
+
+                <li>
+
+                    Simulación transparente del flujo
+                    de ejecución de cadenas.
+
+                </li>
+
+            </ul>
 
         </div>
 
@@ -68,4 +580,5 @@
 </div>
 
 </body>
+
 </html>
